@@ -152,7 +152,7 @@ export function buildBody(params, materials) {
     if (o.isMesh) o.castShadow = o.receiveShadow = true;
   });
 
-  return { figure, torso, head, headR: p.headR, anchors, paintFeatures, feet, onTiptoe: legPose !== 'debout' };
+  return { figure, torso, head, headR: p.headR, anchors, paintFeatures, feet };
 }
 
 // ---------------------------------------------------------------------------

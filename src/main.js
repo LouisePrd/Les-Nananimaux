@@ -10,7 +10,7 @@ import { addAnimalAttributes } from './attributes.js';
 import { drawParams, fromQuery, toQuery } from './params.js';
 import { createPanel } from './panel.js';
 import { paintTexture } from './paint.js';
-import { buildSocle, SOCLE_THICKNESS, ROD_HEIGHT } from './socle.js';
+import { buildSocle, SOCLE_THICKNESS } from './socle.js';
 import { createGallery } from './gallery.js';
 import './style.css';
 
@@ -93,10 +93,10 @@ function build({ reframe }) {
   figure.updateMatrixWorld(true);
   const figureBox = new THREE.Box3().setFromObject(figure);
   const center = figureBox.getCenter(new THREE.Vector3());
-  const lift = SOCLE_THICKNESS + (body.onTiptoe ? ROD_HEIGHT : 0);
-  figure.position.set(-center.x, -figureBox.min.y + lift, -center.z);
+  // centrée, les pieds posés sur le socle
+  figure.position.set(-center.x, -figureBox.min.y + SOCLE_THICKNESS, -center.z);
   const feet = body.feet.map((foot) => foot.clone().add(figure.position));
-  root.add(buildSocle(feet, body.onTiptoe));
+  root.add(buildSocle(feet));
   scene.add(root);
   current = root;
   const box = new THREE.Box3().setFromObject(root);

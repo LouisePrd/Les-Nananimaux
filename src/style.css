@@ -1,9 +1,9 @@
 :root {
-  --paper: #BCCCDC; /* fond de page, papier kraft clair */
+  --paper: #F8EDE3; /* fond de page, papier kraft clair */
   --card: #fbf8f1; /* intérieur des cadres */
-  --ink: #1d1b19;
+  --ink: #7D6E83;
   --muted: #6d665c;
-  --accent: #f4c430;
+  --accent: #D0B8A8;
   --hand: 'Patrick Hand', 'Comic Sans MS', cursive;
 }
 
@@ -76,13 +76,13 @@ body {
 h1 {
   grid-column: 1 / -1;
   margin: 0;
-  font-size: 2.6rem;
+  font-family: 'Caprasimo', var(--hand); /* empattements épais, rétro années 60-70 */
+  font-size: 2.8rem;
   font-weight: 400;
   line-height: 1;
   text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  transform: rotate(-1deg);
+  letter-spacing: 0.04em;
+  margin-bottom: 3px;
 }
 
 h2 {

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import '@fontsource/patrick-hand';
+import '@fontsource/caprasimo/latin.css';
 import { newSeed } from './random.js';
 import { createMaterials } from './materials.js';
 import { buildBody } from './body.js';

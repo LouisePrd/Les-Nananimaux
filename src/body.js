@@ -124,11 +124,19 @@ export function buildBody(params, materials) {
   }
 
   // ---------- Jambes (en coordonnées monde) ----------
+  const feet = []; // bout des pieds d'appui, pour poser la sculpture sur son socle
   for (const side of [1, -1]) {
     const legRng = params.stream(`jambe${side}`);
     const hip = torso.localToWorld(new THREE.Vector3(side * p.hipR * 0.45, p.hipY * 0.85, 0));
     const raised = legPose !== 'debout' && side === raisedSide;
-    const geometry = raised ? buildRaisedLeg(legRng, p, hip, side, legPose) : buildSupportLeg(legRng, p, hip, side, legPose);
+    let geometry;
+    if (raised) {
+      geometry = buildRaisedLeg(legRng, p, hip, side, legPose);
+    } else {
+      const leg = buildSupportLeg(legRng, p, hip, side, legPose);
+      geometry = leg.geometry;
+      feet.push(leg.toe);
+    }
     figure.add(new THREE.Mesh(geometry, limbs));
   }
 
@@ -144,7 +152,7 @@ export function buildBody(params, materials) {
     if (o.isMesh) o.castShadow = o.receiveShadow = true;
   });
 
-  return { figure, torso, head, headR: p.headR, anchors, paintFeatures };
+  return { figure, torso, head, headR: p.headR, anchors, paintFeatures, feet, onTiptoe: legPose !== 'debout' };
 }
 
 // ---------------------------------------------------------------------------
@@ -321,7 +329,8 @@ function buildSupportLeg(rng, p, hip, side, legPose) {
   // pied à plat ou sur la pointe (comme une danseuse)
   const footDir = flat ? limbDirection(-1.35, side * 0.2) : limbDirection(rng.range(-0.45, -0.2), 0);
   const footLen = flat ? 0.34 : 0.3;
-  return variableTube(legPoints(hip, knee, ankle, footDir, footLen), legRadii(p));
+  const points = legPoints(hip, knee, ankle, footDir, footLen);
+  return { geometry: variableTube(points, legRadii(p)), toe: points[points.length - 1] };
 }
 
 function buildRaisedLeg(rng, p, hip, side, legPose) {

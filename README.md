@@ -16,4 +16,5 @@ Sculptures 3D génératives inspirées des Nanas de Niki de Saint Phalle, avec d
 | `src/body.js` | Corps : proportions, torse (surface de révolution déformée), poses des bras et jambes |
 | `src/attributes.js` | Attributs animaux, répartis en emplacements : tête, dos, queue |
 | `src/materials.js` | Palettes et matériaux (`skin` = peau peinte, `limbs` = noir laqué) |
+| `src/socle.js` | Socle : disque en métal sombre, et tige quand la Nana danse sur un pied |
 | `src/paint.js` | Motifs génératifs peints sur la peau (bandes, spirale, rayures, mosaïque, uni) |

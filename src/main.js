@@ -10,6 +10,7 @@ import { addAnimalAttributes } from './attributes.js';
 import { drawParams, fromQuery, toQuery } from './params.js';
 import { createPanel } from './panel.js';
 import { paintTexture } from './paint.js';
+import { buildSocle, SOCLE_THICKNESS, ROD_HEIGHT } from './socle.js';
 import './style.css';
 
 const BACKGROUND = '#fbf8f1'; // même crème que l'intérieur des cadres
@@ -85,18 +86,20 @@ function build({ reframe }) {
   materials.skin.map = getPaint(params, body.paintFeatures);
   addAnimalAttributes(params, body, materials);
 
-  // Pose la sculpture au sol, centrée
   const figure = body.figure;
   const root = new THREE.Group();
   root.add(figure);
   figure.updateMatrixWorld(true);
-  const box = new THREE.Box3().setFromObject(figure);
-  const center = box.getCenter(new THREE.Vector3());
-  figure.position.set(-center.x, -box.min.y, -center.z);
+  const figureBox = new THREE.Box3().setFromObject(figure);
+  const center = figureBox.getCenter(new THREE.Vector3());
+  const lift = SOCLE_THICKNESS + (body.onTiptoe ? ROD_HEIGHT : 0);
+  figure.position.set(-center.x, -figureBox.min.y + lift, -center.z);
+  const feet = body.feet.map((foot) => foot.clone().add(figure.position));
+  root.add(buildSocle(feet, body.onTiptoe));
   scene.add(root);
   current = root;
+  const box = new THREE.Box3().setFromObject(root);
 
-  // Nouvelle sculpture : on recadre et on relance la rotation. Simple réglage : la caméra ne bouge pas.
   if (reframe) {
     const size = box.getSize(new THREE.Vector3());
     const height = Math.max(size.y, size.x * 0.8);

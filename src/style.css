@@ -22,6 +22,18 @@ body {
   background: var(--paper);
 }
 
+html,
+body,
+.column {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.column::-webkit-scrollbar {
+  display: none;
+}
+
 /* ---------- Cadres dessinés à la main ---------- */
 .sketch {
   position: relative;
@@ -76,21 +88,22 @@ h1 {
   grid-column: 1 / -1;
   margin: 0;
   font-family: 'Caprasimo', var(--hand);
-  font-size: 2.8rem;
+  font-size: 3rem;
   font-weight: 400;
   line-height: 1;
   text-align: center;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   margin-bottom: 3px;
 }
 
 h2 {
   margin: 0 0 8px;
-  font-size: 1.05rem;
-  font-weight: 400;
+  color: #51405a;
+  font-size: 1.15rem;
+  font-weight: 600;
   text-align: center;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.16em;
 }
 
 .stage-column {
@@ -228,13 +241,14 @@ button.arrow {
 /* ---------- Palettes ---------- */
 .swatches {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .swatch {
   position: relative;
+  flex: 0 0 32px;
   width: 32px;
   height: 32px;
   padding: 0;
@@ -269,11 +283,16 @@ button.arrow {
 #poses {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 22px;
 }
 
 .choice h2 {
-  margin-bottom: 4px;
+  margin: 5px 0 0;
+  line-height: 1.15;
+}
+
+#silhouette {
+  margin-top: 16px;
 }
 
 .select {
@@ -290,7 +309,7 @@ button.arrow {
   letter-spacing: 0.06em;
   text-overflow: ellipsis;
   appearance: none;
-  cursor: pointer;
+  pointer-events: none;
   outline: none;
 }
 
@@ -306,8 +325,11 @@ button.arrow {
   display: grid;
   place-items: center;
   width: 38px;
+  padding: 0;
   border-left: 2.5px solid var(--ink);
-  pointer-events: none;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
 }
 
 /* ---------- Curseurs de silhouette ---------- */
@@ -320,9 +342,11 @@ button.arrow {
 }
 
 .slider-label {
+  color: #51405a;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .slider input {

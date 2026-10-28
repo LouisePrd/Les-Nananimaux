@@ -74,21 +74,26 @@ export function createPanel(settings, { onChange }) {
   poses.innerHTML = POSE_KEYS.map((key) => {
     const { label, options } = CHOICES[key];
     return `
-      <label class="choice">
-        <h2>${label}</h2>
+      <div class="choice">
         <span class="select sketch">
-          <select data-key="${key}">
+          <select data-key="${key}" aria-label="${label}">
             <option value="${RANDOM}"></option>
             ${Object.entries(options)
               .map(([id, text]) => `<option value="${id}">${text}</option>`)
               .join('')}
           </select>
-          <span class="select-arrow">▽</span>
+          <button type="button" class="select-arrow" aria-label="Ouvrir le menu ${label}">▽</button>
         </span>
-      </label>`;
+        <h2>${label}</h2>
+      </div>`;
   }).join('');
   for (const select of poses.querySelectorAll('select')) {
     select.addEventListener('change', () => set(select.dataset.key, select.value));
+  }
+  for (const arrow of poses.querySelectorAll('.select-arrow')) {
+    arrow.addEventListener('click', () => {
+      arrow.parentElement.querySelector('select').showPicker();
+    });
   }
 
   // ---------- Silhouette : curseurs ----------

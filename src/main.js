@@ -11,6 +11,7 @@ import { drawParams, fromQuery, toQuery } from './params.js';
 import { createPanel } from './panel.js';
 import { paintTexture } from './paint.js';
 import { buildSocle, SOCLE_THICKNESS, ROD_HEIGHT } from './socle.js';
+import { createGallery } from './gallery.js';
 import './style.css';
 
 const BACKGROUND = '#fbf8f1'; // même crème que l'intérieur des cadres
@@ -112,6 +113,7 @@ function build({ reframe }) {
 
   panel.show(params);
   updateUrl();
+  gallery.refresh();
 }
 
 // Peindre la texture prend quelques dizaines de millisecondes : on la garde tant que
@@ -142,6 +144,30 @@ function dispose(object) {
 function updateUrl() {
   history.replaceState(null, '', `?${toQuery(seed, settings)}`);
 }
+
+// Vignette carrée prise au centre de la vue
+function captureThumbnail() {
+  renderer.render(scene, camera);
+  const size = 240;
+  const thumb = document.createElement('canvas');
+  thumb.width = thumb.height = size;
+  const side = Math.min(canvas.width, canvas.height);
+  thumb
+    .getContext('2d')
+    .drawImage(canvas, (canvas.width - side) / 2, (canvas.height - side) / 2, side, side, 0, 0, size, size);
+  return thumb.toDataURL('image/jpeg', 0.85);
+}
+
+const gallery = createGallery({
+  currentKey: () => toQuery(seed, settings),
+  capture: captureThumbnail,
+  onSelect: (key) => {
+    const saved = fromQuery(key);
+    seed = saved.seed;
+    Object.assign(settings, saved.settings);
+    requestBuild({ reframe: true });
+  },
+});
 
 function generate() {
   seed = newSeed();

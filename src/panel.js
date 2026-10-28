@@ -46,6 +46,10 @@ export function createPanel(settings, { onChange }) {
         set(key, values[next]);
       });
     }
+    // cliquer sur la boîte d'un carrousel fixé le remet au hasard
+    carousels.querySelector(`[data-key="${key}"] .carousel-box`).addEventListener('click', () => {
+      if (settings[key] !== null) set(key, RANDOM);
+    });
   }
 
   // ---------- Palettes ----------
@@ -113,7 +117,8 @@ export function createPanel(settings, { onChange }) {
       const value = currentValue(params, key);
       const box = carousels.querySelector(`[data-key="${key}"] .carousel-box`);
       box.innerHTML = iconSVG(key, value);
-      box.title = value === NONE ? 'Aucun' : CHOICES[key].options[value];
+      const label = value === NONE ? 'Aucun' : CHOICES[key].options[value];
+      box.title = settings[key] === null ? `${label} (au hasard)` : `${label} (fixé : cliquer pour remettre au hasard)`;
       box.classList.toggle('is-random', settings[key] === null);
     }
 

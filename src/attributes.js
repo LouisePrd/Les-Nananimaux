@@ -15,6 +15,7 @@ export const ATTRIBUTE_SLOTS = {
       cerf: { label: 'Bois de cerf', make: boisCerf },
       chat: { label: 'Oreilles de chat', make: oreillesChat },
       lapin: { label: 'Oreilles de lapin', make: oreillesLapin },
+      antennes: { label: 'Antennes', make: antennes },
     },
   },
   dos: {
@@ -22,6 +23,7 @@ export const ATTRIBUTE_SLOTS = {
     variants: {
       oiseau: { label: "Ailes d'oiseau", make: ailesOiseau },
       papillon: { label: 'Ailes de papillon', make: ailesPapillon },
+      nageoire: { label: 'Nageoire dorsale', make: nageoireDorsale },
     },
   },
   queue: {
@@ -31,6 +33,7 @@ export const ATTRIBUTE_SLOTS = {
       lion: { label: 'Queue de lion', make: queueLion },
       diable: { label: 'Queue de diable', make: queueDiable },
       renard: { label: 'Queue de renard', make: queueRenard },
+      poisson: { label: 'Queue de poisson', make: queuePoisson },
     },
   },
 };
@@ -177,6 +180,29 @@ function oreillesLapin(rng, { headR }, skin) {
   return object;
 }
 
+// Antennes de papillon : tiges fines et souples terminées par une boule
+function antennes(rng, { headR }, skin) {
+  const k = headR / 0.17;
+  const len = rng.range(0.8, 1.3) * k;
+  const spread = rng.range(0.7, 1.3);
+  const curl = rng.range(-0.08, 0.06);
+  const object = mirrored(() => {
+    const group = new THREE.Group();
+    const base = V(0.25 * headR, 1.0 * headR, 0.1 * headR);
+    const pts = offsetPoints(
+      base,
+      [[0, 0, 0], [0.05 * spread, 0.18, 0.06], [0.12 * spread, 0.34, 0.08 + curl], [0.2 * spread, 0.45, 0.02 + 2 * curl]],
+      len,
+    );
+    group.add(new THREE.Mesh(variableTube(pts, [0.018, 0.015, 0.012, 0.01].map((r) => r * k), { roundEnd: false }), skin));
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(0.04 * k, 24, 16), skin);
+    ball.position.copy(pts[pts.length - 1]);
+    group.add(ball);
+    return group;
+  });
+  return object;
+}
+
 // ---------------------------------------------------------------------------
 // Dos
 
@@ -263,6 +289,39 @@ function ailesPapillon(rng, { anchors }, skin) {
   return object;
 }
 
+// Nageoire dorsale : une grande voile courbe plantée le long de la colonne
+function nageoireDorsale(rng, { anchors }, skin) {
+  const size = rng.range(0.8, 1.2);
+  const reach = rng.range(0.4, 0.6);
+  const rise = rng.range(0.25, 0.5);
+  const shape = new THREE.Shape();
+  shape.moveTo(0, -0.35);
+  shape.bezierCurveTo(0.15, -0.2, reach * 0.7, rise * 0.3, reach, rise);
+
+  shape.quadraticCurveTo(reach * 0.75, rise * 0.75, reach * 0.62, rise * 0.62);
+  shape.quadraticCurveTo(reach * 0.45, rise * 0.62, reach * 0.33, rise * 0.48);
+  shape.quadraticCurveTo(reach * 0.18, rise * 0.5, 0, 0.25);
+  shape.closePath();
+
+  const depth = 0.025;
+  const geometry = new THREE.ExtrudeGeometry(shape, {
+    depth,
+    bevelEnabled: true,
+    bevelThickness: 0.015,
+    bevelSize: 0.015,
+    bevelSegments: 4,
+    curveSegments: 40,
+  });
+  geometry.translate(0, 0, -depth / 2);
+  const fin = new THREE.Mesh(geometry, skin);
+
+  fin.rotation.y = Math.PI / 2;
+  fin.scale.setScalar(size);
+
+  fin.position.copy(anchors.back).add(V(0, -0.05, 0.1));
+  return fin;
+}
+
 // ---------------------------------------------------------------------------
 // Queue
 
@@ -331,5 +390,37 @@ function queueRenard(rng, { anchors }, skin) {
     rng.range(0.9, 1.2),
   );
   const object = new THREE.Mesh(variableTube(pts, [0.06, 0.13, 0.19, 0.2, 0.15, 0.04]), skin);
+  return object;
+}
+
+function queuePoisson(rng, { anchors }, skin) {
+  const pts = tailPoints(
+    rng,
+    anchors.tail,
+    [[0, 0, 0], [0.03, -0.12, -0.2], [0.06, -0.15, -0.45], [0.05, 0, -0.65], [0.03, 0.2, -0.75]],
+    rng.range(0.9, 1.2),
+  );
+  const object = new THREE.Group();
+  object.add(new THREE.Mesh(variableTube(pts, [0.08, 0.08, 0.06, 0.04, 0.025], { roundEnd: false }), skin));
+
+  const spread = rng.range(0.25, 0.38);
+  const length = rng.range(0.3, 0.42);
+  const shape = new THREE.Shape();
+  shape.moveTo(0, 0);
+  shape.bezierCurveTo(-0.08, 0.08, -spread * 0.9, length * 0.7, -spread, length);
+  shape.quadraticCurveTo(-spread * 0.35, length * 0.62, 0, length * 0.55);
+  shape.quadraticCurveTo(spread * 0.35, length * 0.62, spread, length);
+  shape.bezierCurveTo(spread * 0.9, length * 0.7, 0.08, 0.08, 0, 0);
+  const depth = 0.02;
+  const geometry = new THREE.ExtrudeGeometry(shape, {
+    depth,
+    bevelEnabled: true,
+    bevelThickness: 0.012,
+    bevelSize: 0.012,
+    bevelSegments: 3,
+    curveSegments: 32,
+  });
+  geometry.translate(0, -0.02, -depth / 2);
+  object.add(tip(new THREE.Mesh(geometry, skin), pts));
   return object;
 }

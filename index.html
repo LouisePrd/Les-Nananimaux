@@ -26,7 +26,9 @@
           <canvas id="scene"></canvas>
         </div>
         <div class="bottom-row">
+          <button id="favorite" class="sketch icon-button" aria-label="Garder dans la galerie"></button>
           <button id="generate" class="sketch primary">Générer</button>
+          <button id="open-gallery" class="sketch">Galerie <span id="gallery-count"></span></button>
         </div>
       </section>
 
@@ -35,6 +37,18 @@
         <div id="silhouette"></div>
       </aside>
     </main>
+
+    <!-- Galerie des Nanas gardées -->
+    <div id="gallery" class="gallery" hidden>
+      <div class="gallery-panel sketch">
+        <div class="gallery-header">
+          <h2>Galerie</h2>
+          <button class="gallery-close sketch" aria-label="Fermer">×</button>
+        </div>
+        <p class="gallery-empty">Aucune Nana gardée pour l'instant : cliquez sur ♡ pour garder celle qui vous plaît.</p>
+        <div class="gallery-grid"></div>
+      </div>
+    </div>
 
     <script type="module" src="/src/main.js"></script>
   </body>

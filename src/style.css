@@ -1,7 +1,7 @@
 :root {
   --paper: #F8EDE3;
   --card: #fbf8f1;
-  --ink: #7D6E83;
+  --ink: #63516a;
   --muted: #6d665c;
   --accent: #D0B8A8;
   --hand: 'Patrick Hand', 'Comic Sans MS', cursive;
@@ -216,6 +216,15 @@ button.arrow {
   opacity: 0.4;
 }
 
+.carousel-box:not(.is-random),
+.select:has(select:not(.is-random)) {
+  background: color-mix(in srgb, var(--accent) 65%, var(--card));
+}
+
+.carousel-box:not(.is-random) {
+  cursor: pointer;
+}
+
 /* ---------- Palettes ---------- */
 .swatches {
   display: flex;
@@ -361,6 +370,116 @@ button.arrow {
 
 .slider.is-random input::-moz-range-thumb {
   background: var(--card);
+}
+
+/* ---------- Galerie ---------- */
+button.icon-button {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  padding: 0 2.5px 2.5px 0;
+}
+
+.heart {
+  width: 28px;
+  height: 28px;
+  filter: none;
+}
+
+/* Nana gardée : cœur plein */
+#favorite.saved .heart path {
+  fill: #e63946;
+}
+
+.gallery {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(29, 27, 25, 0.35);
+  z-index: 10;
+}
+
+.gallery[hidden] {
+  display: none;
+}
+
+.gallery-panel {
+  width: min(920px, 90vw);
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 18px 24px 26px;
+}
+
+.gallery-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.gallery-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+button.gallery-close {
+  width: 40px;
+  height: 40px;
+  padding: 0 2.5px 2.5px 0;
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.gallery-empty {
+  text-align: center;
+  color: var(--muted);
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 22px;
+}
+
+.gallery-item {
+  padding: 5px 7px 7px 5px;
+}
+
+.gallery-open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  background: none;
+}
+
+.gallery-open img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 6px;
+}
+
+.gallery-remove {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 2.5px solid var(--ink);
+  border-radius: 50%;
+  background: var(--card);
+  font-size: 1.1rem;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.gallery-item:hover .gallery-remove,
+.gallery-remove:focus-visible {
+  opacity: 1;
 }
 
 /* ---------- Petits écrans : tout sur une colonne ---------- */

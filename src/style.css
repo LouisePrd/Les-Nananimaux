@@ -1,6 +1,6 @@
 :root {
-  --paper: #F8EDE3; /* fond de page, papier kraft clair */
-  --card: #fbf8f1; /* intérieur des cadres */
+  --paper: #F8EDE3;
+  --card: #fbf8f1;
   --ink: #7D6E83;
   --muted: #6d665c;
   --accent: #D0B8A8;
@@ -23,7 +23,6 @@ body {
 }
 
 /* ---------- Cadres dessinés à la main ---------- */
-/* Le trait est sur un pseudo-élément : seul le cadre « tremble », pas le contenu. */
 .sketch {
   position: relative;
   background: var(--card);
@@ -35,7 +34,7 @@ body {
   position: absolute;
   inset: 0;
   border: solid var(--ink);
-  border-width: 2.5px 5px 5px 2.5px; /* trait plus épais en bas à droite */
+  border-width: 2.5px 5px 5px 2.5px;
   border-radius: inherit;
   filter: url(#sketch);
   pointer-events: none;
@@ -76,7 +75,7 @@ body {
 h1 {
   grid-column: 1 / -1;
   margin: 0;
-  font-family: 'Caprasimo', var(--hand); /* empattements épais, rétro années 60-70 */
+  font-family: 'Caprasimo', var(--hand);
   font-size: 2.8rem;
   font-weight: 400;
   line-height: 1;
@@ -158,8 +157,6 @@ button.link {
   gap: 18px;
 }
 
-/* titre sous son carrousel, collé à lui, et un grand écart entre les carrousels :
-   on voit tout de suite quel titre va avec quelle boîte */
 #carousels {
   display: flex;
   flex-direction: column;
@@ -188,7 +185,6 @@ button.arrow {
   place-items: center;
   width: 44px;
   height: 44px;
-  /* le cadre est plus épais à droite et en bas : on compense pour centrer visuellement */
   padding: 0 2.5px 2.5px 0;
 }
 
@@ -196,7 +192,7 @@ button.arrow {
   width: 26px;
   height: 26px;
   stroke-width: 3;
-  filter: none; /* trop petites pour le filtre : elles deviendraient illisibles */
+  filter: none;
 }
 
 .carousel-box {
@@ -216,7 +212,6 @@ button.arrow {
   height: 62px;
 }
 
-/* réglage laissé au hasard : l'icône (la valeur tirée) est plus pâle */
 .carousel-box.is-random .icon {
   opacity: 0.4;
 }
@@ -226,7 +221,7 @@ button.arrow {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 16px; /* laisse la place à l'anneau de sélection (contour + écart = 6 px) */
+  gap: 16px;
 }
 
 .swatch {
@@ -276,7 +271,6 @@ button.arrow {
   display: block;
 }
 
-/* le menu occupe toute la boîte, flèche comprise : cliquer n'importe où le déroule */
 .select select {
   width: 100%;
   padding: 9px 50px 9px 12px;
@@ -292,7 +286,7 @@ button.arrow {
 }
 
 .select select.is-random {
-  color: var(--muted); /* texte pâle = au hasard */
+  color: var(--muted);
 }
 
 .select-arrow {
@@ -361,7 +355,6 @@ button.arrow {
   background: var(--ink);
 }
 
-/* au hasard : curseur évidé ; fixé à la main : curseur plein */
 .slider.is-random input::-webkit-slider-thumb {
   background: var(--card);
 }

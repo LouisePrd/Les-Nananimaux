@@ -16,6 +16,27 @@ import './style.css';
 
 const BACKGROUND = '#fbf8f1'; // même crème que l'intérieur des cadres
 
+// Texture de grain :
+function grainTexture(baseColor, strength, size = 512) {
+  const grain = document.createElement('canvas');
+  grain.width = grain.height = size;
+  const ctx = grain.getContext('2d');
+  ctx.fillStyle = baseColor;
+  ctx.fillRect(0, 0, size, size);
+  const image = ctx.getImageData(0, 0, size, size);
+  for (let i = 0; i < image.data.length; i += 4) {
+    const n = (Math.random() - 0.5) * strength;
+    image.data[i] += n;
+    image.data[i + 1] += n;
+    image.data[i + 2] += n;
+  }
+  ctx.putImageData(image, 0, 0);
+  const texture = new THREE.CanvasTexture(grain);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  return texture;
+}
+
 // ---------- Scène ----------
 const canvas = document.querySelector('#scene');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -25,7 +46,7 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(BACKGROUND);
+scene.background = grainTexture(BACKGROUND, 12, 1024); // fond légèrement granuleux
 scene.fog = new THREE.Fog(BACKGROUND, 14, 32);
 
 // Environnement « studio » pour les reflets de la laque
@@ -53,9 +74,10 @@ scene.add(sun, new THREE.HemisphereLight(0xffffff, 0xd8cfc0, 0.6));
 
 const floor = new THREE.Mesh(
   new THREE.CircleGeometry(40, 64),
-  new THREE.MeshStandardMaterial({ color: '#e4ddd0', roughness: 0.95 }),
+  new THREE.MeshStandardMaterial({ map: grainTexture('#e4ddd0', 18), roughness: 0.95 }),
 );
 floor.rotation.x = -Math.PI / 2;
+floor.material.map.repeat.set(10, 10); // grain répété sur tout le sol
 floor.receiveShadow = true;
 scene.add(floor);
 

@@ -1,0 +1,401 @@
+:root {
+  --paper: #BCCCDC; /* fond de page, papier kraft clair */
+  --card: #fbf8f1; /* intérieur des cadres */
+  --ink: #1d1b19;
+  --muted: #6d665c;
+  --accent: #f4c430;
+  --hand: 'Patrick Hand', 'Comic Sans MS', cursive;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--hand);
+  font-size: 17px;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+/* ---------- Cadres dessinés à la main ---------- */
+/* Le trait est sur un pseudo-élément : seul le cadre « tremble », pas le contenu. */
+.sketch {
+  position: relative;
+  background: var(--card);
+  border-radius: 6px 10px 8px 12px;
+}
+
+.sketch::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: solid var(--ink);
+  border-width: 2.5px 5px 5px 2.5px; /* trait plus épais en bas à droite */
+  border-radius: inherit;
+  filter: url(#sketch);
+  pointer-events: none;
+}
+
+.icon {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: url(#sketch);
+}
+
+.icon .fill {
+  fill: var(--ink);
+}
+
+/* ---------- Mise en page ---------- */
+.layout {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr) 270px;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 14px 28px;
+  height: 100vh;
+  padding: 24px 28px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  overflow-y: auto;
+  padding: 4px 10px 16px 4px;
+}
+
+/* titre centré en haut, sur toute la largeur */
+h1 {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 2.6rem;
+  font-weight: 400;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  transform: rotate(-1deg);
+}
+
+h2 {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  font-weight: 400;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+.stage-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+}
+
+.stage {
+  flex: 1;
+  min-height: 0;
+  padding: 7px 9px 9px 7px;
+  border-radius: 10px 14px 12px 16px;
+}
+
+#scene {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+}
+
+/* ---------- Boutons ---------- */
+button {
+  font: inherit;
+  color: inherit;
+  border: none;
+  cursor: pointer;
+}
+
+button.sketch {
+  padding: 12px 22px;
+  font-size: 1.15rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  transition: transform 0.1s;
+}
+
+button.sketch:hover {
+  transform: rotate(-1.5deg);
+}
+
+button.sketch:active {
+  transform: translate(2px, 2px);
+}
+
+button.primary {
+  background: var(--accent);
+}
+
+button.link {
+  padding: 0;
+  background: none;
+  font-size: 0.95rem;
+  text-decoration: underline wavy;
+  text-underline-offset: 4px;
+}
+
+/* ---------- Barre du bas : actions ---------- */
+.bottom-row {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+}
+
+/* titre sous son carrousel, collé à lui, et un grand écart entre les carrousels :
+   on voit tout de suite quel titre va avec quelle boîte */
+#carousels {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.carousel h2,
+#palettes h2 {
+  margin: 6px 0 0;
+}
+
+.column-left {
+  gap: 30px;
+}
+
+/* ---------- Carrousels d'attributs ---------- */
+.carousel-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+button.arrow {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  /* le cadre est plus épais à droite et en bas : on compense pour centrer visuellement */
+  padding: 0 2.5px 2.5px 0;
+}
+
+.arrow .icon {
+  width: 26px;
+  height: 26px;
+  stroke-width: 3;
+  filter: none; /* trop petites pour le filtre : elles deviendraient illisibles */
+}
+
+.carousel-box {
+  display: grid;
+  place-items: center;
+  width: 86px;
+  height: 86px;
+  border-radius: 8px 12px 6px 10px;
+}
+
+.carousel-box::before {
+  border-width: 3px 7px 7px 3px;
+}
+
+.carousel-box .icon {
+  width: 62px;
+  height: 62px;
+}
+
+/* réglage laissé au hasard : l'icône (la valeur tirée) est plus pâle */
+.carousel-box.is-random .icon {
+  opacity: 0.4;
+}
+
+/* ---------- Palettes ---------- */
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px; /* laisse la place à l'anneau de sélection (contour + écart = 6 px) */
+}
+
+.swatch {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 50%;
+  transition: transform 0.1s;
+}
+
+.swatch::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2.5px solid var(--ink);
+  border-radius: 50%;
+  filter: url(#sketch);
+}
+
+.swatch:hover {
+  transform: scale(1.1);
+}
+
+.swatch.selected {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.swatch.drawn {
+  outline: 2.5px dashed var(--ink);
+  outline-offset: 3px;
+}
+
+/* ---------- Menus de pose ---------- */
+#poses {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.choice h2 {
+  margin-bottom: 4px;
+}
+
+.select {
+  display: block;
+}
+
+/* le menu occupe toute la boîte, flèche comprise : cliquer n'importe où le déroule */
+.select select {
+  width: 100%;
+  padding: 9px 50px 9px 12px;
+  border: none;
+  background: transparent;
+  font: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-overflow: ellipsis;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.select select.is-random {
+  color: var(--muted); /* texte pâle = au hasard */
+}
+
+.select-arrow {
+  position: absolute;
+  top: 0;
+  right: 5px;
+  bottom: 5px;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  border-left: 2.5px solid var(--ink);
+  pointer-events: none;
+}
+
+/* ---------- Curseurs de silhouette ---------- */
+.slider {
+  display: grid;
+  grid-template-columns: 74px 1fr;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.slider-label {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.9rem;
+}
+
+.slider input {
+  width: 100%;
+  height: 24px;
+  margin: 0;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+  filter: url(#sketch);
+}
+
+.slider input::-webkit-slider-runnable-track {
+  height: 3px;
+  background: var(--ink);
+  border-radius: 2px;
+}
+
+.slider input::-moz-range-track {
+  height: 3px;
+  background: var(--ink);
+}
+
+.slider input::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -8px;
+  border: 2.5px solid var(--ink);
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.slider input::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 2.5px solid var(--ink);
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+/* au hasard : curseur évidé ; fixé à la main : curseur plein */
+.slider.is-random input::-webkit-slider-thumb {
+  background: var(--card);
+}
+
+.slider.is-random input::-moz-range-thumb {
+  background: var(--card);
+}
+
+/* ---------- Petits écrans : tout sur une colonne ---------- */
+@media (max-width: 1100px) {
+  html,
+  body {
+    overflow: auto;
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  h1 {
+    order: -2;
+  }
+
+  .stage-column {
+    order: -1;
+  }
+
+  .stage {
+    flex: none;
+    height: 65vh;
+  }
+
+  .column {
+    overflow: visible;
+  }
+}

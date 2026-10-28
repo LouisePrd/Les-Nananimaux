@@ -1,0 +1,19 @@
+# Dépendances
+node_modules/
+
+# Build de Vite
+dist/
+
+# Logs
+npm-debug.log*
+*.log
+
+# Variables d'environnement
+.env
+.env.*
+
+# Éditeurs et système
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store

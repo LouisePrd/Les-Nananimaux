@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Les Nanaminaux</title>
+  </head>
+  <body>
+    <!-- Filtre qui fait « trembler » les traits, comme dessinés à la main -->
+    <svg width="0" height="0" style="position: absolute">
+      <filter id="sketch">
+        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="7" />
+        <feDisplacementMap in="SourceGraphic" scale="3.5" />
+      </filter>
+    </svg>
+
+    <main class="layout">
+      <h1>Les Nanaminaux</h1>
+
+      <aside class="column column-left">
+        <div id="carousels"></div>
+        <div id="palettes"></div>
+      </aside>
+
+      <section class="stage-column">
+        <div class="stage sketch">
+          <canvas id="scene"></canvas>
+        </div>
+        <div class="bottom-row">
+          <button id="generate" class="sketch primary">Générer</button>
+        </div>
+      </section>
+
+      <aside class="column column-right">
+        <div id="poses"></div>
+        <div id="silhouette"></div>
+      </aside>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

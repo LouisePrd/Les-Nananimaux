@@ -87,18 +87,28 @@ export function buildBody(params, materials) {
   const neckTop = p.neckY + 0.12;
   const neck = variableTube(
     [new THREE.Vector3(0, p.shoulderY - 0.05, 0), new THREE.Vector3(0, p.neckY, 0), new THREE.Vector3(0, neckTop, 0)],
-    [0.12, 0.1, 0.1],
+    [0.12, 0.095, 0.08],
     { segments: 16, roundStart: false, roundEnd: false },
   );
   torso.add(new THREE.Mesh(neck, limbs));
 
   const headRng = params.stream('tete');
   const head = new THREE.Group();
-  head.position.set(0, neckTop + p.headR * 0.9, 0);
-  head.rotation.set(headRng.range(-0.15, 0.15), headRng.range(-0.3, 0.3), headRng.range(-0.2, 0.2));
-  const headMesh = new THREE.Mesh(new THREE.SphereGeometry(p.headR, 48, 32), limbs);
-  headMesh.scale.set(0.95, 1.12, 1);
+  head.position.set(0, neckTop + p.headR * 0.88, 0);
+  head.rotation.set(headRng.range(-0.08, 0.08), headRng.range(-0.16, 0.16), headRng.range(-0.1, 0.1));
+  const headGeometry = new THREE.SphereGeometry(1, 48, 32);
+  const headPositions = headGeometry.attributes.position;
+  for (let i = 0; i < headPositions.count; i++) {
+    const y = headPositions.getY(i);
+    const jawTaper = 1 - 0.18 * Math.max(0, -y);
+    headPositions.setX(i, headPositions.getX(i) * jawTaper);
+    headPositions.setZ(i, headPositions.getZ(i) * jawTaper);
+  }
+  headGeometry.computeVertexNormals();
+  const headMesh = new THREE.Mesh(headGeometry, limbs);
+  headMesh.scale.set(0.95 * p.headR, 1.12 * p.headR, 0.88 * p.headR);
   head.add(headMesh);
+  addFace(head, p.headR, headRng);
   torso.add(head);
 
   // ---------- Pose ----------
@@ -153,6 +163,63 @@ export function buildBody(params, materials) {
   });
 
   return { figure, torso, head, headR: p.headR, anchors, paintFeatures, feet };
+}
+
+function addFace(head, headR, rng) {
+  const ink = new THREE.MeshStandardMaterial({ color: '#493b4e', roughness: 0.55 });
+  const ivory = new THREE.MeshStandardMaterial({ color: '#fff3e5', roughness: 0.45 });
+  const eyeSpacing = rng.range(0.3, 0.35);
+  const eyeRadius = rng.range(0.095, 0.11) * headR;
+  const surfaceZ = (x, y) => {
+    const taper = 1 - 0.18 * Math.max(0, -y);
+    return 0.88 * headR * taper * Math.sqrt(Math.max(0, 1 - x * x - y * y));
+  };
+
+  for (const side of [-1, 1]) {
+    const x = side * eyeSpacing;
+    const y = 0.12;
+    const z = surfaceZ(x, y);
+    const socket = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 16), ink);
+    socket.scale.set(eyeRadius * 1.15, eyeRadius * 1.35, eyeRadius * 0.7);
+    socket.position.set(x * 0.95 * headR, y * 1.12 * headR, z + eyeRadius * 0.8);
+    head.add(socket);
+
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 16), ivory);
+    eye.scale.set(eyeRadius * 0.76, eyeRadius, eyeRadius * 0.55);
+    eye.position.set(x * 0.95 * headR, y * 1.12 * headR, z + eyeRadius * 1.4);
+    head.add(eye);
+
+    const pupil = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 12), ink);
+    pupil.scale.set(eyeRadius * 0.38, eyeRadius * 0.52, eyeRadius * 0.45);
+    pupil.position.set((x + side * 0.012) * 0.95 * headR, y * 1.12 * headR, z + eyeRadius * 1.9);
+    head.add(pupil);
+  }
+
+  const nose = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 12), ink);
+  nose.scale.set(0.06 * headR, 0.045 * headR, 0.04 * headR);
+  nose.position.set(0, -0.08 * 1.12 * headR, surfaceZ(0, -0.08) + 0.08 * headR);
+  head.add(nose);
+
+  const mouthWidth = rng.range(0.17, 0.2);
+  const mouthPoints = [
+    [-mouthWidth, -0.25],
+    [-mouthWidth * 0.55, -0.32],
+    [0, -0.34],
+    [mouthWidth * 0.55, -0.32],
+    [mouthWidth, -0.25],
+  ].map(
+    ([x, y]) =>
+      new THREE.Vector3(
+        x * 0.95 * headR,
+        y * 1.12 * headR,
+        surfaceZ(x, y) + 0.05 * headR,
+      ),
+  );
+  const mouth = new THREE.Mesh(
+    new THREE.TubeGeometry(new THREE.CatmullRomCurve3(mouthPoints), 24, 0.018 * headR, 8, false),
+    ink,
+  );
+  head.add(mouth);
 }
 
 // ---------------------------------------------------------------------------

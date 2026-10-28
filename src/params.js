@@ -18,7 +18,7 @@ export const SHAPE_SLIDERS = [
   { key: 'breasts', label: 'Poitrine', min: 0.06, max: 0.32 },
   { key: 'belly', label: 'Ventre', min: 0.04, max: 0.3 },
   { key: 'buttocks', label: 'Fesses', min: 0.03, max: 0.2 },
-  { key: 'head', label: 'Tête', min: 0.12, max: 0.21 },
+  { key: 'head', label: 'Tête', min: 0.16, max: 0.26 },
   { key: 'limbs', label: 'Membres', min: 0.85, max: 1.2 },
 ];
 

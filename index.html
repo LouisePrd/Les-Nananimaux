@@ -4,6 +4,47 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Les Nananimaux</title>
+    <!-- styles du chargement en ligne : affichés avant que le JS et le CSS n'arrivent -->
+    <style>
+      #loader {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: grid;
+        place-content: center;
+        justify-items: center;
+        gap: 18px;
+        background: #f8ede3;
+        color: #63516a;
+        font: 1.3rem 'Patrick Hand', 'Comic Sans MS', cursive;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        transition: opacity 0.5s;
+      }
+      #loader.done {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .loader-dots {
+        display: flex;
+        gap: 12px;
+      }
+      .loader-dots span {
+        width: 18px;
+        height: 18px;
+        border: 2.5px solid #63516a;
+        border-radius: 50%;
+        animation: loader-bounce 0.9s ease-in-out infinite;
+      }
+      .loader-dots span:nth-child(1) { background: #e63946; }
+      .loader-dots span:nth-child(2) { background: #f4c430; animation-delay: 0.15s; }
+      .loader-dots span:nth-child(3) { background: #1d4fd8; animation-delay: 0.3s; }
+      .loader-dots span:nth-child(4) { background: #ff7eb6; animation-delay: 0.45s; }
+      @keyframes loader-bounce {
+        0%, 100% { transform: translateY(0) rotate(0); }
+        50% { transform: translateY(-14px) rotate(-8deg); }
+      }
+    </style>
   </head>
   <body>
     <svg width="0" height="0" style="position: absolute">
@@ -12,6 +53,11 @@
         <feDisplacementMap in="SourceGraphic" scale="3.5" />
       </filter>
     </svg>
+
+    <div id="loader" role="status">
+      <div class="loader-dots" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+      <p>Chargement…</p>
+    </div>
 
     <main class="layout">
       <h1>Les Nananimaux</h1>

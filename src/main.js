@@ -295,7 +295,18 @@ function animate(now) {
   }
   controls.update();
   renderer.render(scene, camera);
+  if (loader) hideLoader(now);
   requestAnimationFrame(animate);
+}
+
+// Écran de chargement
+const LOADER_MIN = 700;
+let loader = document.querySelector('#loader');
+function hideLoader(now) {
+  if (now < LOADER_MIN) return;
+  loader.classList.add('done');
+  loader.addEventListener('transitionend', (e) => e.target.remove(), { once: true });
+  loader = null;
 }
 
 requestBuild({ reframe: true });

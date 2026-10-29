@@ -38,18 +38,12 @@ export function pickBodyColor(rng, paletteColors) {
 export function createMaterials(bodyColor) {
   // `skin` : la peau peinte du torse et des attributs animaux.
   // Sa texture (les motifs) est ajoutée après la construction du corps, voir paint.js.
-  const skin = new THREE.MeshPhysicalMaterial({
-    roughness: 0.35,
-    clearcoat: 1,
-    clearcoatRoughness: 0.08,
-  });
+  const skin = new THREE.MeshStandardMaterial({ roughness: 0.55 });
 
-  // Peau unie laquée : membres, tête, ailes et queue
-  const limbs = new THREE.MeshPhysicalMaterial({
+  // Peau unie : membres, tête, ailes et queue
+  const limbs = new THREE.MeshStandardMaterial({
     color: bodyColor,
-    roughness: 0.3,
-    clearcoat: 1,
-    clearcoatRoughness: 0.05,
+    roughness: 0.5,
   });
 
   return { skin, limbs };

@@ -7,8 +7,14 @@ export const SOCLE_THICKNESS = 0.1;
 export function buildSocle(feet) {
   const group = new THREE.Group();
   // métal sombre
-  const material = new THREE.MeshPhysicalMaterial({ color: '#2b2a2a', metalness: 0.6, roughness: 0.35, clearcoat: 0.6 });
-  const center = feet.reduce((sum, f) => sum.add(f), new THREE.Vector3()).divideScalar(feet.length);
+  const material = new THREE.MeshPhysicalMaterial({
+    color: '#2b2a2a',
+    metalness: 0.6,
+    roughness: 0.5,
+    clearcoat: 0.25,
+    clearcoatRoughness: 0.3,
+  });
+  const center = new THREE.Vector3();
   const spread = Math.max(...feet.map((f) => Math.hypot(f.x - center.x, f.z - center.z)));
   const radius = Math.max(0.85, spread + 0.5);
 

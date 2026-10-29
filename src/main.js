@@ -52,7 +52,7 @@ scene.fog = new THREE.Fog(BACKGROUND, 14, 32);
 // Environnement « studio » pour les reflets de la laque
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-scene.environmentIntensity = 0.7;
+scene.environmentIntensity = 0.45;
 
 const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
 camera.position.set(0, 2.2, 10);
@@ -63,7 +63,7 @@ controls.maxPolarAngle = Math.PI / 2 - 0.05; // pas sous le sol
 controls.autoRotateSpeed = 1.2;
 controls.addEventListener('start', () => (controls.autoRotate = false));
 
-const sun = new THREE.DirectionalLight(0xffffff, 2.2);
+const sun = new THREE.DirectionalLight(0xffffff, 1.8);
 sun.position.set(3, 7, 5);
 sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);

@@ -86,7 +86,7 @@ export function variableTube(points, radii, options = {}) {
     for (let k = 0; k < radialSegments; k++) {
       const a = s * row + k;
       const b = (s + 1) * row + k;
-      indices.push(a, b, a + 1, b, b + 1, a + 1);
+      indices.push(a, a + 1, b, b, a + 1, b + 1);
     }
   }
 

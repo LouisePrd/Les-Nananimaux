@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { res } from './geometry.js';
 
 // Socle comme sur les Nanas
 export const SOCLE_THICKNESS = 0.1;
@@ -28,7 +29,7 @@ export function buildSocle(feet) {
     [radius - 0.02, t],
     [0, t],
   ].map(([x, y]) => new THREE.Vector2(x, y));
-  const disk = new THREE.Mesh(new THREE.LatheGeometry(profile, 96), material);
+  const disk = new THREE.Mesh(new THREE.LatheGeometry(profile, res(96, 12)), material);
   disk.position.set(center.x, 0, center.z);
   group.add(disk);
 

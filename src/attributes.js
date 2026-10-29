@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { variableTube } from './geometry.js';
+import { variableTube, res } from './geometry.js';
 
 // Chaque attribut se fixe sur un emplacement : tête, dos ou queue.
 // Le choix des emplacements et des variantes se fait dans params.js (hasard ou panneau de réglages).
@@ -158,7 +158,7 @@ function oreillesChat(rng, { headR }, skin) {
   const h = rng.range(0.13, 0.19) * k;
   const tilt = rng.range(0.45, 0.7);
   const object = mirrored(() => {
-    const ear = new THREE.Mesh(new THREE.ConeGeometry(0.075 * k, h, 32), skin);
+    const ear = new THREE.Mesh(new THREE.ConeGeometry(0.075 * k, h, res(32, 6)), skin);
     ear.geometry.scale(1, 1, 0.4);
     placeOnHead(ear, headR, tilt, rng.range(-0.15, 0.05), h / 2);
     return ear;
@@ -172,7 +172,7 @@ function oreillesLapin(rng, { headR }, skin) {
   const tilt = rng.range(0.15, 0.4);
   const droop = rng.range(-0.6, 0);
   const object = mirrored(() => {
-    const ear = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 20), skin);
+    const ear = new THREE.Mesh(new THREE.SphereGeometry(1, res(32, 6), res(20, 4)), skin);
     ear.geometry.scale(0.055 * k, len, 0.025 * k);
     placeOnHead(ear, headR, tilt, droop, len);
     return ear;
@@ -195,7 +195,7 @@ function antennes(rng, { headR }, skin) {
       len,
     );
     group.add(new THREE.Mesh(variableTube(pts, [0.018, 0.015, 0.012, 0.01].map((r) => r * k), { roundEnd: false }), skin));
-    const ball = new THREE.Mesh(new THREE.SphereGeometry(0.04 * k, 24, 16), skin);
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(0.04 * k, res(24, 6), res(16, 4)), skin);
     ball.position.copy(pts[pts.length - 1]);
     group.add(ball);
     return group;
@@ -221,7 +221,7 @@ function ailesOiseau(rng, { anchors }, skin) {
     const boneEnd = V(Math.cos(lift), Math.sin(lift), 0).multiplyScalar(span * 0.6);
     wing.add(new THREE.Mesh(variableTube([V(0, 0, 0), boneEnd.clone().multiplyScalar(0.5), boneEnd], [0.08, 0.06, 0.035], { segments: 48 }), skin));
 
-    const feather = new THREE.SphereGeometry(1, 24, 12);
+    const feather = new THREE.SphereGeometry(1, res(24, 6), res(12, 4));
     for (let i = 0; i < count; i++) {
       const t = i / (count - 1); // 0 = bout de l'aile (rémiges primaires), 1 = près du dos
       const base = V(0, 0, 0).lerp(boneEnd, 1 - t * 0.9);
@@ -270,8 +270,8 @@ function ailesPapillon(rng, { anchors }, skin) {
     bevelEnabled: true,
     bevelThickness: 0.015,
     bevelSize: 0.015,
-    bevelSegments: 4,
-    curveSegments: 40,
+    bevelSegments: res(4, 1),
+    curveSegments: res(40, 6),
   };
 
   const object = mirrored(() => {
@@ -309,8 +309,8 @@ function nageoireDorsale(rng, { anchors }, skin) {
     bevelEnabled: true,
     bevelThickness: 0.015,
     bevelSize: 0.015,
-    bevelSegments: 4,
-    curveSegments: 40,
+    bevelSegments: res(4, 1),
+    curveSegments: res(40, 6),
   });
   geometry.translate(0, 0, -depth / 2);
   const fin = new THREE.Mesh(geometry, skin);
@@ -358,7 +358,7 @@ function queueLion(rng, { anchors }, skin) {
   const pts = tailPoints(rng, anchors.tail, CAT_TAIL, rng.range(1.0, 1.4));
   const object = new THREE.Group();
   object.add(new THREE.Mesh(variableTube(pts, [0.06, 0.045, 0.035, 0.03, 0.03, 0.03]), skin));
-  const tuft = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 20), skin);
+  const tuft = new THREE.Mesh(new THREE.SphereGeometry(1, res(32, 6), res(20, 4)), skin);
   tuft.geometry.scale(0.09, 0.17, 0.09);
   tuft.geometry.translate(0, 0.1, 0);
   object.add(tip(tuft, pts));
@@ -417,8 +417,8 @@ function queuePoisson(rng, { anchors }, skin) {
     bevelEnabled: true,
     bevelThickness: 0.012,
     bevelSize: 0.012,
-    bevelSegments: 3,
-    curveSegments: 32,
+    bevelSegments: res(3, 1),
+    curveSegments: res(32, 6),
   });
   geometry.translate(0, -0.02, -depth / 2);
   object.add(tip(new THREE.Mesh(geometry, skin), pts));

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { variableTube, limbDirection } from './geometry.js';
+import { variableTube, limbDirection, res } from './geometry.js';
 
 // Repère : y vers le haut, +z vers l'avant (face à la caméra), +x vers la droite de la sculpture.
 // side = +1 pour le côté droit, -1 pour le côté gauche.
@@ -96,7 +96,7 @@ export function buildBody(params, materials) {
   const head = new THREE.Group();
   head.position.set(0, neckTop + p.headR * 0.88, 0);
   head.rotation.set(headRng.range(-0.08, 0.08), headRng.range(-0.16, 0.16), headRng.range(-0.1, 0.1));
-  const headGeometry = new THREE.SphereGeometry(1, 48, 32);
+  const headGeometry = new THREE.SphereGeometry(1, res(48, 8), res(32, 6));
   const headPositions = headGeometry.attributes.position;
   for (let i = 0; i < headPositions.count; i++) {
     const y = headPositions.getY(i);
@@ -181,7 +181,7 @@ function torsoProfile(p) {
     [0.12, p.neckY],
     [0.0, p.neckY + 0.01],
   ].map(([r, y]) => new THREE.Vector2(r, y));
-  return new THREE.SplineCurve(pts).getPoints(72).map((v) => new THREE.Vector2(Math.max(0, v.x), v.y));
+  return new THREE.SplineCurve(pts).getPoints(res(72, 12)).map((v) => new THREE.Vector2(Math.max(0, v.x), v.y));
 }
 
 function profileRadiusAt(profile, y) {
@@ -206,7 +206,7 @@ function bumpOffset(bumps, y, a) {
 }
 
 function buildTorsoGeometry(profile, bumps, depth) {
-  const radial = 96;
+  const radial = res(96, 12);
   // phiStart = π : la couture de la surface de révolution se retrouve dans le dos
   const geometry = new THREE.LatheGeometry(profile, radial, Math.PI);
   const pos = geometry.attributes.position;

@@ -1,5 +1,22 @@
 import * as THREE from 'three';
 
+// Niveau de détail des maillages (1 = normal). Les mini-Nanas qui recouvrent la grande Nana
+// sont construites avec un détail réduit : elles sont des centaines à l'écran.
+let detail = 1;
+
+export function withDetail(level, build) {
+  detail = level;
+  try {
+    return build();
+  } finally {
+    detail = 1;
+  }
+}
+
+export function res(n, min = 3) {
+  return Math.max(min, Math.round(n * detail));
+}
+
 /**
  * Tube à rayon variable le long d'une courbe passant par des points de contrôle.
  * C'est la brique de base des membres, du cou, des queues et des cornes.
@@ -12,12 +29,9 @@ import * as THREE from 'three';
  *   - roundStart / roundEnd : arrondit les extrémités en dôme (bouts des doigts, orteils…)
  */
 export function variableTube(points, radii, options = {}) {
-  const {
-    segments = 160,
-    radialSegments = 36,
-    roundStart = true,
-    roundEnd = true,
-  } = options;
+  const { roundStart = true, roundEnd = true } = options;
+  const segments = res(options.segments ?? 160, 4);
+  const radialSegments = res(options.radialSegments ?? 36, 6);
 
   const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal');
   const n = points.length - 1;

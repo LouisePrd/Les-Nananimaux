@@ -90,6 +90,10 @@ function contrasting(fill, colors, rng) {
 
 // La texture fait le tour du corps : une zone qui dépasse d'un côté réapparaît de l'autre
 function forEachCopy(region, draw) {
+  if (region.box.w >= W) {
+    draw(0);
+    return;
+  }
   for (let k = -4; k <= 4; k++) {
     const offset = k * W;
     if (region.box.x + offset < W && region.box.x + region.box.w + offset > 0) draw(offset);

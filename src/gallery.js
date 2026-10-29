@@ -18,9 +18,9 @@ function load() {
  * @param currentKey () => clé de la Nana affichée
  * @param capture    () => vignette (data URL) de la Nana affichée
  * @param onSelect   (clé) => affiche la Nana choisie dans la galerie
- * @param onExport   (clés, onProgress) => exporte la mosaïque de ces Nanas
+ * @param onSwarm (clés) => affiche l'essaim : une grande Nana faite de ces Nanas
  */
-export function createGallery({ currentKey, capture, onSelect, onExport }) {
+export function createGallery({ currentKey, capture, onSelect, onSwarm }) {
   let items = load();
 
   const favorite = document.querySelector('#favorite');
@@ -29,8 +29,8 @@ export function createGallery({ currentKey, capture, onSelect, onExport }) {
   const modal = document.querySelector('#gallery');
   const grid = modal.querySelector('.gallery-grid');
   const empty = modal.querySelector('.gallery-empty');
-  const exportButton = modal.querySelector('.gallery-export');
-  const EXPORT_LABEL = exportButton.textContent;
+  const swarmButton = document.querySelector('#swarm');
+  const notice = document.querySelector('#swarm-notice');
 
   favorite.innerHTML = HEART;
 
@@ -60,27 +60,27 @@ export function createGallery({ currentKey, capture, onSelect, onExport }) {
   };
   const close = () => {
     modal.hidden = true;
+    notice.hidden = true;
   };
   openButton.addEventListener('click', open);
   modal.querySelector('.gallery-close').addEventListener('click', close);
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) close(); // clic sur le fond
-  });
+  for (const overlay of [modal, notice]) {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) close(); // clic sur le fond
+    });
+  }
+  notice.querySelector('.notice-close').addEventListener('click', close);
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') close();
   });
 
-  // Mosaïque de toutes les Nanas gardées, dans l'ordre de la galerie
-  exportButton.addEventListener('click', async () => {
-    exportButton.disabled = true;
-    try {
-      await onExport(
-        items.map((item) => item.key),
-        (done, total) => (exportButton.textContent = `Export… ${done}/${total}`),
-      );
-    } finally {
-      exportButton.disabled = false;
-      exportButton.textContent = EXPORT_LABEL;
+  // Essaim : il faut au moins une Nana gardée
+  swarmButton.addEventListener('click', () => {
+    if (items.length === 0) {
+      notice.hidden = false;
+      notice.querySelector('.notice-close').focus();
+    } else {
+      onSwarm(items.map((item) => item.key));
     }
   });
 
@@ -102,7 +102,6 @@ export function createGallery({ currentKey, capture, onSelect, onExport }) {
     favorite.title = saved ? 'Retirer de la galerie' : 'Garder dans la galerie';
     count.textContent = items.length ? `(${items.length})` : '';
     empty.hidden = items.length > 0;
-    exportButton.hidden = items.length === 0;
     grid.innerHTML = items
       .map(
         (item) => `

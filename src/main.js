@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import '@fontsource/patrick-hand';
-import { createRandom, newSeed } from './random.js';
+import { createRandom, createStream, newSeed } from './random.js';
 import { createMaterials } from './materials.js';
 import { buildBody } from './body.js';
 import { addAnimalAttributes } from './attributes.js';
@@ -10,8 +10,9 @@ import { drawParams, fromQuery, toQuery } from './params.js';
 import { createPanel } from './panel.js';
 import { paintTexture } from './paint.js';
 import { buildSocle, SOCLE_THICKNESS } from './socle.js';
+import { withDetail } from './geometry.js';
+import { coverWithMinis, disposeKit, makeKit } from './swarm.js';
 import { createGallery } from './gallery.js';
-import { exportMosaic } from './mosaic.js';
 import './style.css';
 
 const BACKGROUND = '#fbf8f1'; // même crème que l'intérieur des cadres
@@ -54,7 +55,7 @@ const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 scene.environmentIntensity = 0.45;
 
-const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+const camera = new THREE.PerspectiveCamera(35, 1, 0.02, 100); // près : on peut zoomer sur les mini-Nanas
 camera.position.set(0, 2.2, 10);
 
 const controls = new OrbitControls(camera, canvas);
@@ -89,6 +90,7 @@ let seed = fromUrl.seed ?? newSeed();
 
 let current = null;
 let bornAt = 0;
+let swarm = null; // mini-Nanas de la galerie, quand l'essaim est affiché
 let pendingBuild = null; // reconstruction demandée, faite à la prochaine image
 
 const panel = createPanel(settings, { onChange: () => requestBuild() });
@@ -124,6 +126,11 @@ function build({ reframe }) {
   }
   const params = drawParams(seed, settings);
   const root = assemble(params, (features) => getPaint(params, features));
+  if (swarm) {
+    const figure = root.children[0];
+    root.add(coverWithMinis(figure, swarm, createStream(seed, 'essaim')));
+    figure.visible = false;
+  }
   scene.add(root);
   current = root;
   const box = new THREE.Box3().setFromObject(root);
@@ -139,7 +146,9 @@ function build({ reframe }) {
   }
 
   panel.show(params);
-  updateUrl();
+  document.querySelector('#favorite').hidden = Boolean(swarm);
+  controls.zoomToCursor = Boolean(swarm); // pour aller voir une mini-Nana précise
+  if (!swarm) updateUrl();
   gallery.refresh();
 }
 
@@ -158,7 +167,7 @@ function getPaint(params, features) {
 function dispose(object) {
   const materials = new Set();
   object.traverse((o) => {
-    if (o.isMesh) {
+    if (o.isMesh && !o.userData.shared) {
       o.geometry.dispose();
       materials.add(o.material);
     }
@@ -207,55 +216,50 @@ function captureThumbnail() {
   return thumb.toDataURL('image/jpeg', 0.85);
 }
 
-const exportCamera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
-const EXPORT_VIEW = new THREE.Vector3(0.45, 0.12, 1).normalize();
-
-function renderNana(key, size) {
-  const saved = fromQuery(key);
-  const params = drawParams(saved.seed, saved.settings);
-  let texture;
-  const root = assemble(params, (features) => (texture = paintTexture({ ...params, features })));
-
-  const box = new THREE.Box3().setFromObject(root);
-  const boxSize = box.getSize(new THREE.Vector3());
-  const target = new THREE.Vector3(0, boxSize.y * 0.47, 0);
-  exportCamera.position.copy(target).addScaledVector(EXPORT_VIEW, Math.max(boxSize.y, boxSize.x) * 2);
-  exportCamera.lookAt(target);
-
-  const ratio = renderer.getPixelRatio();
-  renderer.setPixelRatio(1);
-  renderer.setSize(size, size, false);
-  if (current) current.visible = false;
-  scene.add(root);
-  renderer.render(scene, exportCamera);
-
-  const image = document.createElement('canvas');
-  image.width = image.height = size;
-  image.getContext('2d').drawImage(canvas, 0, 0, size, size, 0, 0, size, size);
-
-  scene.remove(root);
-  dispose(root);
-  texture.dispose();
-  if (current) current.visible = true;
-  renderer.setPixelRatio(ratio);
-  renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
-  return image;
+// Mini-Nanas : une par Nana de la galerie
+const MAX_MINI_SOURCES = 60;
+const kits = new Map(); // clé de la galerie
+function miniKits(keys) {
+  keys = keys.slice(0, MAX_MINI_SOURCES);
+  for (const [key, kit] of kits) {
+    if (!keys.includes(key)) {
+      disposeKit(kit);
+      kits.delete(key);
+    }
+  }
+  return keys.map((key) => {
+    if (!kits.has(key)) {
+      const saved = fromQuery(key);
+      const params = drawParams(saved.seed, saved.settings);
+      const root = withDetail(0.2, () => assemble(params, (features) => paintTexture({ ...params, features })));
+      root.children[1].traverse((o) => o.geometry?.dispose()); // pas de socle pour les mini-Nanas
+      kits.set(key, makeKit(root.children[0]));
+    }
+    return kits.get(key);
+  });
 }
 
 const gallery = createGallery({
   currentKey: () => toQuery(seed, settings),
   capture: captureThumbnail,
-  onExport: (keys, onProgress) => exportMosaic(keys, renderNana, onProgress),
+  // grande Nana recouverte de mini-Nanas de la galerie
+  onSwarm: (keys) => {
+    swarm = miniKits(keys);
+    seed = newSeed();
+    requestBuild({ reframe: true });
+  },
   onSelect: (key) => {
     const saved = fromQuery(key);
     seed = saved.seed;
     Object.assign(settings, saved.settings);
+    swarm = null;
     requestBuild({ reframe: true });
   },
 });
 
 function generate() {
   seed = newSeed();
+  swarm = null;
   requestBuild({ reframe: true });
 }
 

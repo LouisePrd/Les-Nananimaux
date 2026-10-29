@@ -27,8 +27,9 @@
         </div>
         <div class="bottom-row">
           <button id="favorite" class="sketch icon-button" aria-label="Garder dans la galerie"></button>
-          <button id="generate" class="sketch primary">Générer</button>
+          <button id="generate" class="sketch">Générer</button>
           <button id="open-gallery" class="sketch">Galerie <span id="gallery-count"></span></button>
+          <button id="swarm" class="sketch">Essaim</button>
         </div>
       </section>
 
@@ -43,11 +44,22 @@
       <div class="gallery-panel sketch">
         <div class="gallery-header">
           <h2>Galerie</h2>
-          <button class="gallery-export link">Exporter la mosaïque</button>
           <button class="gallery-close sketch" aria-label="Fermer">×</button>
         </div>
         <p class="gallery-empty">Aucune Nana gardée pour l'instant : cliquez sur ♡ pour garder celle qui vous plaît.</p>
         <div class="gallery-grid"></div>
+      </div>
+    </div>
+
+    <!-- Essaim demandé alors que la galerie est vide -->
+    <div id="swarm-notice" class="notice" hidden>
+      <div class="notice-panel sketch" role="dialog" aria-labelledby="swarm-notice-title">
+        <h2 id="swarm-notice-title">Essaim</h2>
+        <p>
+          L'essaim est une grande Nana générée à partir de de toutes les Nanas de votre galerie… qui est encore vide&nbsp;!
+          Sauvegardez d'abord quelques Nanas avec ♡.
+        </p>
+        <button class="notice-close sketch">D'accord</button>
       </div>
     </div>
 

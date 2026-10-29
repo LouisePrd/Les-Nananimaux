@@ -158,19 +158,17 @@ button.sketch {
   font-size: 1.15rem;
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  transition: transform 0.1s;
+  transition: transform 0.1s, background-color 0.15s;
 }
 
 button.sketch:hover {
+  background: var(--accent);
   transform: rotate(-1.5deg);
 }
 
 button.sketch:active {
-  transform: translate(2px, 2px);
-}
-
-button.primary {
   background: var(--accent);
+  transform: translate(2px, 2px);
 }
 
 button.link {
@@ -423,6 +421,10 @@ button.icon-button {
   padding: 0 2.5px 2.5px 0;
 }
 
+button.icon-button[hidden] {
+  display: none;
+}
+
 .heart {
   width: 28px;
   height: 28px;
@@ -434,7 +436,8 @@ button.icon-button {
   fill: #e63946;
 }
 
-.gallery {
+.gallery,
+.notice {
   position: fixed;
   inset: 0;
   display: grid;
@@ -443,7 +446,8 @@ button.icon-button {
   z-index: 10;
 }
 
-.gallery[hidden] {
+.gallery[hidden],
+.notice[hidden] {
   display: none;
 }
 
@@ -466,16 +470,6 @@ button.icon-button {
 .gallery-header h2 {
   margin: 0;
   font-size: 1.4rem;
-}
-
-button.gallery-export {
-  margin-left: auto;
-  margin-right: 22px;
-}
-
-button.gallery-export:disabled {
-  cursor: progress;
-  opacity: 0.6;
 }
 
 button.gallery-close {
@@ -540,6 +534,18 @@ button.gallery-close {
 .gallery-item:hover .gallery-remove,
 .gallery-remove:focus-visible {
   opacity: 1;
+}
+
+/* ---------- Popup (essaim sans Nana gardée) ---------- */
+.notice-panel {
+  width: min(420px, 90vw);
+  padding: 22px 26px 26px;
+  text-align: center;
+}
+
+.notice-panel p {
+  margin: 0 0 20px;
+  line-height: 1.4;
 }
 
 /* ---------- Petits écrans : tout sur une colonne ---------- */

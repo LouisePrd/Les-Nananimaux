@@ -2,8 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import '@fontsource/patrick-hand';
-import '@fontsource/caprasimo/latin.css';
-import { newSeed } from './random.js';
+import { createRandom, newSeed } from './random.js';
 import { createMaterials } from './materials.js';
 import { buildBody } from './body.js';
 import { addAnimalAttributes } from './attributes.js';
@@ -12,6 +11,7 @@ import { createPanel } from './panel.js';
 import { paintTexture } from './paint.js';
 import { buildSocle, SOCLE_THICKNESS } from './socle.js';
 import { createGallery } from './gallery.js';
+import { exportMosaic } from './mosaic.js';
 import './style.css';
 
 const BACKGROUND = '#fbf8f1'; // même crème que l'intérieur des cadres
@@ -98,15 +98,10 @@ function requestBuild(options = {}) {
   pendingBuild = { reframe: pendingBuild?.reframe || options.reframe || false };
 }
 
-function build({ reframe }) {
-  if (current) {
-    scene.remove(current);
-    dispose(current);
-  }
-  const params = drawParams(seed, settings);
+function assemble(params, paintFor) {
   const materials = createMaterials(params.bodyColor);
   const body = buildBody(params, materials);
-  materials.skin.map = getPaint(params, body.paintFeatures);
+  materials.skin.map = paintFor(body.paintFeatures);
   addAnimalAttributes(params, body, materials);
 
   const figure = body.figure;
@@ -119,6 +114,16 @@ function build({ reframe }) {
   figure.position.set(-center.x, -figureBox.min.y + SOCLE_THICKNESS, -center.z);
   const feet = body.feet.map((foot) => foot.clone().add(figure.position));
   root.add(buildSocle(feet));
+  return root;
+}
+
+function build({ reframe }) {
+  if (current) {
+    scene.remove(current);
+    dispose(current);
+  }
+  const params = drawParams(seed, settings);
+  const root = assemble(params, (features) => getPaint(params, features));
   scene.add(root);
   current = root;
   const box = new THREE.Box3().setFromObject(root);
@@ -162,6 +167,28 @@ function dispose(object) {
 }
 
 // ---------- Interface ----------
+const TITLE_COLORS = ['#e63946', '#f4c430', '#1d4fd8', '#2a9d4f', '#ff7eb6', '#ff8c1a', '#7b3fbf', '#25b8c9'];
+function danceTitle(title) {
+  const random = createRandom(7);
+  const colors = random.shuffle(TITLE_COLORS);
+  const text = title.textContent;
+  let n = 0;
+  title.setAttribute('aria-label', text);
+  title.innerHTML = [...text]
+    .map((char) => {
+      if (char === ' ') return '<span class="space" aria-hidden="true"> </span>';
+      const style = [
+        `--color: ${colors[n++ % colors.length]}`,
+        `--tilt: ${random.range(-11, 11).toFixed(1)}deg`,
+        `--lift: ${random.range(-0.1, 0.1).toFixed(2)}em`,
+        `--size: ${random.range(0.9, 1.12).toFixed(2)}`,
+      ].join('; ');
+      return `<span aria-hidden="true" style="${style}">${char}</span>`;
+    })
+    .join('');
+}
+danceTitle(document.querySelector('h1'));
+
 // L'adresse garde la graine et les réglages fixés : recharger la page redonne la même sculpture
 function updateUrl() {
   history.replaceState(null, '', `?${toQuery(seed, settings)}`);
@@ -180,9 +207,45 @@ function captureThumbnail() {
   return thumb.toDataURL('image/jpeg', 0.85);
 }
 
+const exportCamera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+const EXPORT_VIEW = new THREE.Vector3(0.45, 0.12, 1).normalize();
+
+function renderNana(key, size) {
+  const saved = fromQuery(key);
+  const params = drawParams(saved.seed, saved.settings);
+  let texture;
+  const root = assemble(params, (features) => (texture = paintTexture({ ...params, features })));
+
+  const box = new THREE.Box3().setFromObject(root);
+  const boxSize = box.getSize(new THREE.Vector3());
+  const target = new THREE.Vector3(0, boxSize.y * 0.47, 0);
+  exportCamera.position.copy(target).addScaledVector(EXPORT_VIEW, Math.max(boxSize.y, boxSize.x) * 2);
+  exportCamera.lookAt(target);
+
+  const ratio = renderer.getPixelRatio();
+  renderer.setPixelRatio(1);
+  renderer.setSize(size, size, false);
+  if (current) current.visible = false;
+  scene.add(root);
+  renderer.render(scene, exportCamera);
+
+  const image = document.createElement('canvas');
+  image.width = image.height = size;
+  image.getContext('2d').drawImage(canvas, 0, 0, size, size, 0, 0, size, size);
+
+  scene.remove(root);
+  dispose(root);
+  texture.dispose();
+  if (current) current.visible = true;
+  renderer.setPixelRatio(ratio);
+  renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+  return image;
+}
+
 const gallery = createGallery({
   currentKey: () => toQuery(seed, settings),
   capture: captureThumbnail,
+  onExport: (keys, onProgress) => exportMosaic(keys, renderNana, onProgress),
   onSelect: (key) => {
     const saved = fromQuery(key);
     seed = saved.seed;

@@ -88,13 +88,30 @@ body::-webkit-scrollbar,
 h1 {
   grid-column: 1 / -1;
   margin: 0;
-  font-family: 'Caprasimo', var(--hand);
-  font-size: 3rem;
+  font-family: var(--hand);
+  font-size: 3.8rem;
   font-weight: 400;
   line-height: 1;
   text-align: center;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.02em;
   margin-bottom: 3px;
+}
+
+h1 span {
+  display: inline-block;
+  color: var(--color);
+  font-size: calc(var(--size) * 1em);
+  text-shadow: 2.5px 2.5px 0 var(--ink);
+  transform: translateY(var(--lift)) rotate(var(--tilt));
+  transition: transform 0.25s;
+}
+
+h1 span:hover {
+  transform: translateY(calc(var(--lift) - 0.12em)) rotate(calc(var(--tilt) * -1));
+}
+
+h1 .space {
+  width: 0.3em;
 }
 
 h2 {
@@ -447,6 +464,16 @@ button.icon-button {
 .gallery-header h2 {
   margin: 0;
   font-size: 1.4rem;
+}
+
+button.gallery-export {
+  margin-left: auto;
+  margin-right: 22px;
+}
+
+button.gallery-export:disabled {
+  cursor: progress;
+  opacity: 0.6;
 }
 
 button.gallery-close {

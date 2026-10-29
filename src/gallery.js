@@ -18,8 +18,9 @@ function load() {
  * @param currentKey () => clé de la Nana affichée
  * @param capture    () => vignette (data URL) de la Nana affichée
  * @param onSelect   (clé) => affiche la Nana choisie dans la galerie
+ * @param onExport   (clés, onProgress) => exporte la mosaïque de ces Nanas
  */
-export function createGallery({ currentKey, capture, onSelect }) {
+export function createGallery({ currentKey, capture, onSelect, onExport }) {
   let items = load();
 
   const favorite = document.querySelector('#favorite');
@@ -28,6 +29,8 @@ export function createGallery({ currentKey, capture, onSelect }) {
   const modal = document.querySelector('#gallery');
   const grid = modal.querySelector('.gallery-grid');
   const empty = modal.querySelector('.gallery-empty');
+  const exportButton = modal.querySelector('.gallery-export');
+  const EXPORT_LABEL = exportButton.textContent;
 
   favorite.innerHTML = HEART;
 
@@ -67,6 +70,20 @@ export function createGallery({ currentKey, capture, onSelect }) {
     if (e.key === 'Escape') close();
   });
 
+  // Mosaïque de toutes les Nanas gardées, dans l'ordre de la galerie
+  exportButton.addEventListener('click', async () => {
+    exportButton.disabled = true;
+    try {
+      await onExport(
+        items.map((item) => item.key),
+        (done, total) => (exportButton.textContent = `Export… ${done}/${total}`),
+      );
+    } finally {
+      exportButton.disabled = false;
+      exportButton.textContent = EXPORT_LABEL;
+    }
+  });
+
   grid.addEventListener('click', (e) => {
     const remove = e.target.closest('.gallery-remove');
     const pick = e.target.closest('.gallery-open');
@@ -85,6 +102,7 @@ export function createGallery({ currentKey, capture, onSelect }) {
     favorite.title = saved ? 'Retirer de la galerie' : 'Garder dans la galerie';
     count.textContent = items.length ? `(${items.length})` : '';
     empty.hidden = items.length > 0;
+    exportButton.hidden = items.length === 0;
     grid.innerHTML = items
       .map(
         (item) => `
